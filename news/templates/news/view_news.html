@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+
+{% block title %}
+{{news_item.title}} :: {{block.super}}
+{% endblock %}
+
+{% block sidebar %}
+{% include 'inc/_sidebar.html' %}
+{% endblock %}
+
+{% block content %}
+<div class="card mb-3">
+    <div class="card-header">
+          Категория: <a href="{{ news_item.category.get_absolute_url }}">{{news_item.category}}</a>
+        </div>
+        <div class="card-body">
+            <div class="media">
+          {% if item.photo %}
+            <img src="{{ news_item.photo.url }}" alt="" width="150" class="mr-3">
+          {% else %}
+<img src="https://img4.labirint.ru/rc/eb9a6f337b9276955f5cef40a6ccf6c8/363x561q80/books46/451006/cover.png?1575397507" alt="" width="150" class="mr-3">
+          {% endif %}
+          <div class ="media-body">
+            <h5 class="card-title ">{{ news_item.title }}</h5>
+            <p class="card-text">{{ news_item.content|safe|linebreaks}}</p>
+              </div>
+            </div>
+        </div>
+      <div class="card-footer text-muted">
+              {{item.created_at | date:"Y-m-d H-i"}}
+      </div>
+    </div>
+{% endblock %}
+
