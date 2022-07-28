@@ -53,12 +53,18 @@ def contact(request):
     else:
         form = ContactForm()
     return render(request, 'news/test.html', {"form" : form})
+    
+class MyBlog(ListView):
+    model = News
+    template_name = 'news/BLOG.html'
+    context_object_name = 'BLOG'
+
 
 class HomeNews(ListView):
     model = News
     template_name = 'news/home_news_list.html'
     context_object_name = 'news'
-    paginate_by = 2
+    paginate_by = 4
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -83,7 +89,7 @@ class NewsByCategory(ListView):
     template_name = 'news/home_news_list.html'
     context_object_name = 'news'
     allow_empty = False
-    paginate_by = 2
+    paginate_by = 3
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
