@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'debug_toolbar',
     'captcha',
 ]
+SILENCED_SYSTEM_CHECKS = ['captcha.recaptcha_test_key_error']
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -149,7 +150,7 @@ INTERNAL_IPS = [
 EMAIL_HOST = 'smtp.mail.ru'
 EMAIL_PORT = 465
 EMAIL_HOST_USER = 'goloveikozhenya@mail.ru'
-EMAIL_HOST_PASSWORD = '192837Qweasdzxc'
+EMAIL_HOST_PASSWORD = '918273Ewqdsacxz'
 EMAIL_USE_TLS = False
 EMAIL_USE_SSL = True
 

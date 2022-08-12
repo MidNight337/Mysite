@@ -1,8 +1,9 @@
 from django.contrib import admin
-from .models import News, Category
+from .models import News, Category, Reviews
 from django.utils.safestring import mark_safe
 from django import forms
 from ckeditor_uploader.widgets import CKEditorUploadingWidget
+
 
 class NewsAdminForm(forms.ModelForm):
     content = forms.CharField(widget=CKEditorUploadingWidget())
@@ -38,3 +39,7 @@ admin.site.register (Category, CategoryAdmin)
 
 admin.site.site_header = 'Админка'
 admin.site.site_header = "Админка"
+
+@admin.register(Reviews)
+class ReviewsAdmin(admin.ModelAdmin):
+    pass

@@ -1,13 +1,58 @@
+from cgitb import text
+from email import message
+import imp
+from tabnanny import verbose
+from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, get_object_or_404, redirect
+from django.views import View
+from django.views.generic.edit import FormMixin
 from django.views.generic import ListView, DetailView, CreateView
-from .models import News, Category
-from .forms import NewsForm, UserRegisterForm, UserLoginForm, ContactForm
+from .models import News, Category, Reviews 
+from .forms import NewsForm, UserRegisterForm, UserLoginForm, ContactForm, CommentForm
 from django.urls import reverse_lazy
 from django.core.paginator import Paginator
-from  django.contrib import messages
+from django.contrib import messages
 from django.contrib.auth import login, logout
 from django.core.mail import send_mail
 
+# class BlogAddReview(View):
+
+#     def post(self,request,id):
+#         if request.user.is_authenticated:
+#             post = News.objects.get(id=id)
+#             form = ReviewsForm(request.POST or None)
+#             if  form.is_valid():
+#                 form=form.save(commit=False)
+#                 form.name = request.user.username
+#                 form.post=post
+#                 form.save()
+#             return redirect(request.META.get('HTTP_REFERER','redirect_if_referer_not_found'))
+#         else:
+#             return redirect('login')
+
+# def get_name(request):
+
+#     if request.method == 'POST':
+
+#         form = NameForm(request.POST)
+
+#         if form.is_valid():
+#             # Сохранение формы
+#             form.save()
+
+#             # Редирект на ту же страницу
+#             return HttpResponseRedirect(request.path_info)
+
+#     else:
+#     # метод GET
+
+#         form = NameForm()
+
+#         # Получение всех имен из БД.
+#         names = Name.objects.all()
+
+#     # И добавляем names в контекст, чтобы плучить к ним доступ в шаблоне
+#     return render(request, 'name.html', {'form': form, 'names': names})
 
 def register(request):
     if request.method == 'POST':
@@ -22,6 +67,31 @@ def register(request):
     else:
         form = UserRegisterForm()
     return render(request, 'news/register.html', {"form" : form})
+
+# class AddReview(CreateView):
+#     model = Reviews
+#     success_url = reverse_lazy('success_page')
+#     verbose_name = 'submit'
+#     form_class = ReviewForm
+    
+#     def form_valid(self, form):
+#         # формирование сообщения для отправки
+#         data = form.data
+#         subject = f'Cообщение с формы от {data["name"]} Почта отправителя: {data["name"]}' 
+#         email(subject, data['text'])
+#         return super().form_valid(form)
+
+# # Отправка сообщения
+# def email(subject, content):
+#     send_mail(subject,
+#             content,
+#             'goloveikozhenya@mail.ru',
+#             ['goloveikozhenya77@gmail.com'] )
+
+# #Возвращение сообщения при успешном заполеннии формы
+# def success(request):
+#     return HttpResponse('Письмо отправлено!')
+
 
 def user_login(request):
     if request.method == "POST":
@@ -38,14 +108,49 @@ def user_logout(request):
     logout(request)
     return redirect('login')
 
+# def contacter(request):
+#     if request.method == 'POST':
+#         return redirect('home')
+
+#def submit(request):
+#    return redirect('home')
+#class Reviews(models.Model):
+
+    
+# class FormReview(View):
+#     def post(self, request, pk):
+#         form = ReviewForm(request.POST)
+#         news = News.objects.all(id=pk)
+#         if form.is_valid():
+#             form = form.save(commit = False)
+#             form.news = news
+#             form.save()
+#         return redirect('http://127.0.0.1:8000/BLOG/')
+
+# def newcontact(request):
+#     if request.method == "POST":
+#         form = NewContactForm(data = request.POST)
+#         if form.is_valid():
+#             mail = send_mail(form.cleaned_data['subject'], form.cleaned_data['content'], 'goloveikozhenya@mail.ru', ['goloveikozhenya77@gmail.com'] , fail_silently=False)
+#             if mail:
+#                 messages.success(request, "Письмо отправлено!")
+#                 return redirect('BLOG.html')
+#             else:
+#                 messages.error(request, 'Ощибка отправки письма!')
+#         else:
+#             messages.error(request, 'Ошибка валидации!')
+#     else:
+#         form = NewContactForm()
+#     return render(request, 'news/BLOG.html', {"form" : form})
+
 def contact(request):
     if request.method == "POST":
         form = ContactForm(data = request.POST)
         if form.is_valid():
-            mail = send_mail(form.cleaned_data['subject'], form.cleaned_data['content'], 'goloveikozhenya@mail.ru', ['goloveikozhenya77@gmail.com'] , fail_silently=True)
+            mail = send_mail(form.cleaned_data['subject'], form.cleaned_data['content'], 'goloveikozhenya@mail.ru', ['goloveikozhenya77@gmail.com'] , fail_silently=False)
             if mail:
                 messages.success(request, "Письмо отправлено!")
-                return redirect("contact")
+                
             else:
                 messages.error(request, 'Ощибка отправки письма!')
         else:
@@ -54,6 +159,13 @@ def contact(request):
         form = ContactForm()
     return render(request, 'news/test.html', {"form" : form})
     
+    
+
+# class Contacter(ListView):
+#     model = News
+#     template_name = ''
+#     context_object_name = 'contacter'
+
 class MyBlog(ListView):
     model = News
     template_name = 'news/BLOG.html'
@@ -83,6 +195,10 @@ class HomeNews(ListView):
 #         'title' : 'Список новостей',
 #     }
 #     return render(request, template_name='news/index.html', context = context)
+class Price(ListView):
+    model = News
+    template_name = 'news/price.html'
+    context_object_name = 'price'
 
 class NewsByCategory(ListView):
     model = News
@@ -99,6 +215,10 @@ class NewsByCategory(ListView):
     def get_queryset(self):
         return News.objects.filter(category_id = self.kwargs['category_id'], is_published = True).select_related('category')
 
+
+# def contacter(request):
+#     return HttpResponseRedirect('news/login.html')
+
 # def get_category(request, category_id):
 #     news = News.objects.filter(category_id = category_id)
 #     category = Category.objects.get (pk = category_id)
@@ -109,15 +229,57 @@ class NewsByCategory(ListView):
 #     news_item = get_object_or_404(News, pk=news_id)
 #     return render(request, 'news/view_news.html', {'news_item' : news_item})
 
-class ViewNews(DetailView):
+class CustomSuccessMessageMixin:
+    @property
+    def success_msg(self):
+        return False
+    
+    def form_valid(self, form):
+        messages.success(self.request, self.success_msg)
+        return super().form_valid(form)
+    
+    def get_success_url(self):
+        return '%s?id=%s'%(self.success_url, self.object.id)
+
+
+class ViewNews(CustomSuccessMessageMixin ,FormMixin, DetailView):
     model = News
+    #template_name = 'news_detail.html'
     context_object_name = 'news_item'
+    form_class = CommentForm
+    success_msg = "Комментарий создан!"
+
+    def get_success_url(self, **kwargs):
+        return reverse_lazy('view_news', kwargs={'pk' : self.get_object().id})
+    
+    def post(self, request, *args, **kwargs):
+        if request.user.is_authenticated:
+            form = self.get_form()
+            if form.is_valid():
+                return self.form_valid(form)
+            else:
+                return self.form_invalid(form)
+        
+    
+    def form_valid(self, form):
+        self.object = form.save(commit = False)
+        self.object.product = self.get_object()
+        #self.object.product = self.request.user
+        self.object.save()
+        return super().form_valid(form)
+
+
+
+
 
 class CreateNews(CreateView):
     form_class = NewsForm
     template_name = 'news/add_news.html'
 
-
+#class Submit(ListView):
+#    model = News
+#    template_name = 'news/home_news_list'
+#    context_object_name = 'BLOG'
 
 # def add_news(request):
 #     if request.method == 'POST':
@@ -129,5 +291,5 @@ class CreateNews(CreateView):
 #     else:
 #         form = NewsForm()
 #     return render(request, 'news/add_news.html', {'form' : form})
-# # Create your views here.
+
 

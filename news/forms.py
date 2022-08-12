@@ -1,10 +1,17 @@
 from django import forms
-from .models import News
+from .models import News, Reviews
 import re
 from django.core.exceptions import ValidationError
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.models import User
 from captcha.fields import CaptchaField
+from django.forms import ModelForm
+from django.forms import Textarea
+
+# class NewContactForm(forms.Form):
+#     subject = forms.CharField(label='Тема', widget=forms.TextInput(attrs={'class': 'form-control'}))
+#     content = forms.CharField(label='Текст', widget=forms.TextInput(attrs={'class': 'form-control', "rows": 4}))
+#     captcha = CaptchaField()
 
 class ContactForm(forms.Form):
     subject = forms.CharField(label='Тема', widget=forms.TextInput(attrs={'class': 'form-control'}))
@@ -46,3 +53,27 @@ def clean_title(self):
     if re.match (r'\d', title):
         raise ValidationError('НАЗВАНИЕ НЕ С ЦИФРЫ!')
     return title
+
+# class ReviewForm(forms.ModelForm):
+#     """Форма отзыва"""
+#     class Meta:
+#         model = Reviews
+#         fields =['name', 'email', 'text']
+#         widgets = {
+#             'text' : Textarea(
+#                 attrs = {
+#                     'placeholder' : 'Напиште свое сообщение'
+#                 }
+#             )
+            
+#         }
+
+class CommentForm(forms.ModelForm):
+    class Meta:
+        model = Reviews
+        fields = ('text',)
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args,**kwargs)
+        for field in self.fields:
+            self.fields[field].widget.attrs['class'] = 'form-control'
+        #self.fields['text'].widget = Textarea(attrs={'rows' : 5})

@@ -10,22 +10,53 @@
 
 {% block content %}
 <div class="card mb-3">
-    <div class="card-header">
-          Категория: <a href="{{ news_item.category.get_absolute_url }}">{{news_item.category}}</a>
-        </div>
-        <div class="card-body">
-          {% if item.photo %}
-            <img src="{{ news_item.photo.url }}" alt="" width="150" class="mr-3">
-          {% else %}
-<img src="https://img4.labirint.ru/rc/eb9a6f337b9276955f5cef40a6ccf6c8/363x561q80/books46/451006/cover.png?1575397507" alt="" width="150" class="mr-3">
-          {% endif %}
-
-            <h5 class="card-title ">{{ news_item.title }}</h5>
-            <p class="card-text">{{ news_item.content|safe|linebreaks}}</p>
-          </div>
+  <div class="card-header">
+    Категория: <a href="{{ news_item.category.get_absolute_url }}">{{news_item.category}}</a>
+  </div>
+  <div class="card-body">
+  {% if item.photo %}
+    <img src="{{ news_item.photo.url }}" alt="" width="150" class="mr-3">
+  {% else %}
+    <img src="https://img4.labirint.ru/rc/eb9a6f337b9276955f5cef40a6ccf6c8/363x561q80/books46/451006/cover.png?1575397507" alt="" width="150" class="mr-3">
+  {% endif %}
+  <h5 class="card-title ">{{ news_item.title }}</h5>
+    <p class="card-text">{{ news_item.content|safe|linebreaks}}</p>
       <div class="card-footer text-muted">
-              {{news_item.created_at | date:"Y-m-d H-i"}}
+        {{news_item.created_at | date:"Y-m-d H-i"}}
       </div>
     </div>
+  </div>
+    
+      <p>Комментарии: {{ news_item.comments_articles.all.count}}</p>
+      
+    {% if messages %}
+      <div class = 'alert.alert-success'>
+        {% for m in messages %}
+          {{ m }}
+        {% endfor %}
+      </div>
+    {% endif %}
+       <ul>
+        <div class='card-mb-3'>
+        {% for item in news_item.comments_articles.all %}
+          {% comment %} {% for item in news_item.comments_articles.all %} {% endcomment %}
+            <li>
+              Дата создания: {{ item.create_date }}<br>
+              Имя автора: {{ item.author }}<br>
+              {% comment %} Статус публикации:{{ item.status }}<br><br> {% endcomment %}
+              <br>
+                {{ item.text }} 
+            </li>
+          {% endfor %}
+        </div> 
+        </ul>
+
+          <form action="" id = "add_form" method = 'POST'>
+            {% csrf_token %}
+              {{ form.as_p }}
+          </form>
+              <button form='add_form' type ='submit' class ='btn btn-primary'>Добавить</button>
+        </div>
+</div>
 {% endblock %}
 
