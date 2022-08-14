@@ -26,6 +26,10 @@ class Meta:
     verbose_name_plural = 'Новости'
     ordering = ['-created_at']
 
+class UserProfile(models.Model):
+    user   = models.OneToOneField(User, on_delete=models.CASCADE)
+    avatar = models.ImageField()
+
 class Category (models.Model):
     title = models.TextField(max_length=150, db_index=True, verbose_name='Название категории')
 

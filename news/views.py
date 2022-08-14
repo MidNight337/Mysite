@@ -68,29 +68,8 @@ def register(request):
         form = UserRegisterForm()
     return render(request, 'news/register.html', {"form" : form})
 
-# class AddReview(CreateView):
-#     model = Reviews
-#     success_url = reverse_lazy('success_page')
-#     verbose_name = 'submit'
-#     form_class = ReviewForm
-    
-#     def form_valid(self, form):
-#         # формирование сообщения для отправки
-#         data = form.data
-#         subject = f'Cообщение с формы от {data["name"]} Почта отправителя: {data["name"]}' 
-#         email(subject, data['text'])
-#         return super().form_valid(form)
 
-# # Отправка сообщения
-# def email(subject, content):
-#     send_mail(subject,
-#             content,
-#             'goloveikozhenya@mail.ru',
-#             ['goloveikozhenya77@gmail.com'] )
 
-# #Возвращение сообщения при успешном заполеннии формы
-# def success(request):
-#     return HttpResponse('Письмо отправлено!')
 
 
 def user_login(request):
@@ -108,40 +87,6 @@ def user_logout(request):
     logout(request)
     return redirect('login')
 
-# def contacter(request):
-#     if request.method == 'POST':
-#         return redirect('home')
-
-#def submit(request):
-#    return redirect('home')
-#class Reviews(models.Model):
-
-    
-# class FormReview(View):
-#     def post(self, request, pk):
-#         form = ReviewForm(request.POST)
-#         news = News.objects.all(id=pk)
-#         if form.is_valid():
-#             form = form.save(commit = False)
-#             form.news = news
-#             form.save()
-#         return redirect('http://127.0.0.1:8000/BLOG/')
-
-# def newcontact(request):
-#     if request.method == "POST":
-#         form = NewContactForm(data = request.POST)
-#         if form.is_valid():
-#             mail = send_mail(form.cleaned_data['subject'], form.cleaned_data['content'], 'goloveikozhenya@mail.ru', ['goloveikozhenya77@gmail.com'] , fail_silently=False)
-#             if mail:
-#                 messages.success(request, "Письмо отправлено!")
-#                 return redirect('BLOG.html')
-#             else:
-#                 messages.error(request, 'Ощибка отправки письма!')
-#         else:
-#             messages.error(request, 'Ошибка валидации!')
-#     else:
-#         form = NewContactForm()
-#     return render(request, 'news/BLOG.html', {"form" : form})
 
 def contact(request):
     if request.method == "POST":
@@ -149,8 +94,7 @@ def contact(request):
         if form.is_valid():
             mail = send_mail(form.cleaned_data['subject'], form.cleaned_data['content'], 'goloveikozhenya@mail.ru', ['goloveikozhenya77@gmail.com'] , fail_silently=False)
             if mail:
-                messages.success(request, "Письмо отправлено!")
-                
+                messages.success(request, "Письмо отправлено!")  
             else:
                 messages.error(request, 'Ощибка отправки письма!')
         else:
@@ -161,10 +105,6 @@ def contact(request):
     
     
 
-# class Contacter(ListView):
-#     model = News
-#     template_name = ''
-#     context_object_name = 'contacter'
 
 class MyBlog(ListView):
     model = News
@@ -187,18 +127,16 @@ class HomeNews(ListView):
         return News.objects.filter(is_published=True).select_related('category')
 
 
-# def index(request):
-#     news = News.objects.all()
-#     categories = Category.objects.all()
-#     context = {
-#         'news' : news,
-#         'title' : 'Список новостей',
-#     }
-#     return render(request, template_name='news/index.html', context = context)
+
 class Price(ListView):
     model = News
     template_name = 'news/price.html'
     context_object_name = 'price'
+
+class Faq(ListView):
+    model = News
+    template_name = 'news/faq.html'
+    context_object_name = 'faq'
 
 class NewsByCategory(ListView):
     model = News
@@ -215,19 +153,6 @@ class NewsByCategory(ListView):
     def get_queryset(self):
         return News.objects.filter(category_id = self.kwargs['category_id'], is_published = True).select_related('category')
 
-
-# def contacter(request):
-#     return HttpResponseRedirect('news/login.html')
-
-# def get_category(request, category_id):
-#     news = News.objects.filter(category_id = category_id)
-#     category = Category.objects.get (pk = category_id)
-#     return render(request, 'news/category.html', {'news' : news, 'category' : category, })
-
-# def view_news(request, news_id):
-#     news_item = News.objects.get (pk=news_id)
-#     news_item = get_object_or_404(News, pk=news_id)
-#     return render(request, 'news/view_news.html', {'news_item' : news_item})
 
 class CustomSuccessMessageMixin:
     @property
@@ -259,7 +184,8 @@ class ViewNews(CustomSuccessMessageMixin ,FormMixin, DetailView):
                 return self.form_valid(form)
             else:
                 return self.form_invalid(form)
-        
+        else:
+            return HttpResponse("Вы не авторизованы! Пожалуйста пройдите регистрацию!")
     
     def form_valid(self, form):
         self.object = form.save(commit = False)

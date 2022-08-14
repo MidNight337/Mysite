@@ -1,5 +1,5 @@
 from django import forms
-from .models import News, Reviews
+from .models import News, Reviews, UserProfile
 import re
 from django.core.exceptions import ValidationError
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
@@ -7,6 +7,8 @@ from django.contrib.auth.models import User
 from captcha.fields import CaptchaField
 from django.forms import ModelForm
 from django.forms import Textarea
+from django.core.files.images import get_image_dimensions
+
 
 # class NewContactForm(forms.Form):
 #     subject = forms.CharField(label='Тема', widget=forms.TextInput(attrs={'class': 'form-control'}))
@@ -77,3 +79,40 @@ class CommentForm(forms.ModelForm):
         for field in self.fields:
             self.fields[field].widget.attrs['class'] = 'form-control'
         #self.fields['text'].widget = Textarea(attrs={'rows' : 5})
+
+class UserProfileForm(forms.ModelForm):
+    class Meta:
+        model = UserProfile
+        fields = '__all__'
+         
+        def clean_avatar(self):
+            avatar = self.cleaned_data['avatar']
+
+            try:
+                w, h =get_image_dimensions(avatar)
+
+                max_width = max_height = 100
+                if w > max_width or h > max_height:
+                    raise forms.ValidationError(
+                        u'Please use an image that is '
+                     '%s x %s pixels or smaller.' % (max_width, max_height))
+
+            #validate content type
+                main, sub = avatar.content_type.split('/')
+                if not (main == 'image' and sub in ['jpeg', 'pjpeg', 'gif', 'png']):
+                    raise forms.ValidationError(u'Please use a JPEG, '
+                        'GIF or PNG image.')
+
+            #validate file size
+                if len(avatar) > (20 * 1024):
+                    raise forms.ValidationError(
+                        u'Avatar file size may not exceed 20k.')
+
+            except AttributeError:
+                """
+                Handles case when we are updating the user profile
+                and do not supply a new avatar
+                """
+            pass
+
+            return avatar
