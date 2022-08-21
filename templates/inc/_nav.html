@@ -12,13 +12,16 @@
         <li class="nav-item"><a class="nav-link" href="{% url 'add_news' %}">Добавить новость</a></li>
 
       </ul>
-
+      
       <span class="navbar-text">
         {% if request.user.is_authenticated %}
         Добро пожаловать, {{ user.username }} | <a href="{% url 'logout' %}">Выход</a>
         {% else %}
         <a href="{% url 'register'  %}">register</a> | <a href="{% url 'login' %}">login</a>
         {% endif %}
+      </span>
+      <span class='navbar-text'>
+        {% include 'inc/_searchbar.html'%}
       </span>
     </div>
   </div>

@@ -1,7 +1,11 @@
 from cgitb import text
-from email import message
+from email import contentmanager, message
+from email.mime import base
 import imp
+from multiprocessing import context
+from re import search
 from tabnanny import verbose
+from turtle import title
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, get_object_or_404, redirect
 from django.views import View
@@ -15,44 +19,6 @@ from django.contrib import messages
 from django.contrib.auth import login, logout
 from django.core.mail import send_mail
 
-# class BlogAddReview(View):
-
-#     def post(self,request,id):
-#         if request.user.is_authenticated:
-#             post = News.objects.get(id=id)
-#             form = ReviewsForm(request.POST or None)
-#             if  form.is_valid():
-#                 form=form.save(commit=False)
-#                 form.name = request.user.username
-#                 form.post=post
-#                 form.save()
-#             return redirect(request.META.get('HTTP_REFERER','redirect_if_referer_not_found'))
-#         else:
-#             return redirect('login')
-
-# def get_name(request):
-
-#     if request.method == 'POST':
-
-#         form = NameForm(request.POST)
-
-#         if form.is_valid():
-#             # Сохранение формы
-#             form.save()
-
-#             # Редирект на ту же страницу
-#             return HttpResponseRedirect(request.path_info)
-
-#     else:
-#     # метод GET
-
-#         form = NameForm()
-
-#         # Получение всех имен из БД.
-#         names = Name.objects.all()
-
-#     # И добавляем names в контекст, чтобы плучить к ним доступ в шаблоне
-#     return render(request, 'name.html', {'form': form, 'names': names})
 
 def register(request):
     if request.method == 'POST':
@@ -118,6 +84,17 @@ class HomeNews(ListView):
     context_object_name = 'news'
     paginate_by = 4
 
+    # def search(request):
+    #     if 'q' in request.GET:
+    #         q = request.GET['q']
+    #         data = News.objects.filter(title__icontains = q)
+    #     else:
+    #         data = News.objects.all()
+    #     context = {
+    #         'data' : News
+    #     }
+    #     return render(request, 'news/home_news_list.html', context)
+
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
         context ['title'] ='Главная страница'
@@ -167,9 +144,10 @@ class CustomSuccessMessageMixin:
         return '%s?id=%s'%(self.success_url, self.object.id)
 
 
+
+
 class ViewNews(CustomSuccessMessageMixin ,FormMixin, DetailView):
     model = News
-    #template_name = 'news_detail.html'
     context_object_name = 'news_item'
     form_class = CommentForm
     success_msg = "Комментарий создан!"
@@ -202,20 +180,17 @@ class CreateNews(CreateView):
     form_class = NewsForm
     template_name = 'news/add_news.html'
 
-#class Submit(ListView):
-#    model = News
-#    template_name = 'news/home_news_list'
-#    context_object_name = 'BLOG'
 
-# def add_news(request):
-#     if request.method == 'POST':
-#         form = NewsForm(request.POST)
-#         if form.is_valid():
-#             #print(form.cleaned_data)
-#             news = form.save()
-#             return  redirect(news)
-#     else:
-#         form = NewsForm()
-#     return render(request, 'news/add_news.html', {'form' : form})
+class Search(ListView):
+    paginate_by = 2
+    template_name = 'news/home_news_list2.html'
+    context_object_name = 'news'
 
 
+    def get_queryset(self):
+        return News.objects.filter(title__icontains = self.request.GET.get("q"))
+
+    def get_context_data(self, *args, object_list = None, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['q'] = self.request.GET.get("q")
+        return context

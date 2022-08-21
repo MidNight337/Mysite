@@ -1,0 +1,11 @@
+{% load news_tags %}
+<div class ='search-bar w3layouts-newsletter'>
+    {% comment %} <h3 class ='sear-head editContent'>Поиск Новости</h3> {% endcomment %}
+    <form action="{%url 'search' %}" method ='get' class ='d-flex editContent'>
+    {% csrf_token %} 
+        <input type = 'search' plaseholder ='Введите запрос' name ='q' class='form-control' required =''>
+        <button type = 'submit' class='btn1 btn'>
+            <span class='fa fa-search' aria-hidden='true'></span>
+        </button>
+    </form>
+<div>

@@ -52,11 +52,11 @@
 
                  {% if page_obj.number == p %}
                  <li class="page-item active" aria-current="page">
-                <a class="page-link" href="?page={{ p }}">{{ p }} <span class="sr-only">(current)</span></a>
+                <a class="page-link" href="?page={{ q }}{{ p }}">{{ p }} <span class="sr-only">(current)</span></a>
                 </li>
                  {% elif  p > page_obj.number|add:-3 and p < page_obj.number|add:3 %}
                 <li class="page-item">
-                <a class="page-link" href="?page={{ p }}">{{ p }}</a>
+                <a class="page-link" href="?page={{ q }}{{ p }}">{{ p }}</a>
                 </li>
                 {% endif %}
 

@@ -22,4 +22,5 @@ urlpatterns = (
     # path('submit/', newcontact, name = 'contacter'),
     path('price/', Price.as_view(), name ='price'),
     path('faq/', Faq.as_view(), name = 'faq'),
+    path('search/', Search.as_view(), name='search'),
 )
